@@ -1,4 +1,4 @@
-const CHAT_ENDPOINT = "https://rewards-chatbot.pages.dev/chat";
+const CHAT_ENDPOINT = "/chat";
 
 const authGate = document.getElementById("authGate");
 const unlockForm = document.getElementById("unlockForm");
