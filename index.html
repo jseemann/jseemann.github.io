@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Chatbot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+    <main class="app">
+      <header class="topbar">
+        <h1>Chatbot</h1>
+        <button id="settingsToggle" class="btn ghost" type="button">Settings</button>
+      </header>
+
+      <section id="settingsPanel" class="settings hidden" aria-label="API settings">
+        <label for="apiKey">OpenAI API Key</label>
+        <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
+
+        <label for="model">Model</label>
+        <input id="model" type="text" value="gpt-4.1-mini" autocomplete="off" />
+
+        <button id="saveSettings" class="btn" type="button">Save</button>
+        <p class="note">
+          Your key is stored in this browser only. For production, use a backend proxy instead of exposing API keys client-side.
+        </p>
+      </section>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+
+      <form id="chatForm" class="composer">
+        <textarea
+          id="prompt"
+          rows="1"
+          placeholder="Ask me anything..."
+          aria-label="Message"
+          required
+        ></textarea>
+        <button id="sendButton" class="btn" type="submit">Send</button>
+      </form>
+    </main>
+
+    <template id="messageTemplate">
+      <article class="message">
+        <span class="role"></span>
+        <p class="content"></p>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
