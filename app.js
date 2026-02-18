@@ -16,6 +16,34 @@ const STORAGE_KEYS = {
 
 const conversation = [];
 
+function extractAssistantText(data) {
+  if (typeof data.output_text === "string" && data.output_text.trim()) {
+    return data.output_text.trim();
+  }
+
+  if (!Array.isArray(data.output)) {
+    return "";
+  }
+
+  const parts = [];
+  for (const item of data.output) {
+    if (!item || item.type !== "message" || !Array.isArray(item.content)) {
+      continue;
+    }
+
+    for (const block of item.content) {
+      if (!block) continue;
+      if (typeof block.text === "string" && block.text.trim()) {
+        parts.push(block.text.trim());
+      } else if (typeof block.output_text === "string" && block.output_text.trim()) {
+        parts.push(block.output_text.trim());
+      }
+    }
+  }
+
+  return parts.join("\n\n").trim();
+}
+
 function loadSettings() {
   apiKeyInput.value = localStorage.getItem(STORAGE_KEYS.apiKey) || "";
   modelInput.value = localStorage.getItem(STORAGE_KEYS.model) || "gpt-4.1-mini";
@@ -74,7 +102,7 @@ async function sendMessage(userText) {
   }
 
   const data = await response.json();
-  const assistantText = data.output_text || "No response text returned.";
+  const assistantText = extractAssistantText(data) || "The API returned a response, but no text content.";
   conversation.push({ role: "assistant", content: assistantText });
   appendMessage("assistant", assistantText);
 }
