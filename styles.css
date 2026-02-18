@@ -1,14 +1,14 @@
 :root {
-  --bg: #f7f5ef;
-  --panel: #fffdf8;
-  --text: #1b1a16;
-  --muted: #6b665d;
-  --line: #d8d1c3;
-  --accent: #0a7a6c;
+  --bg: #fff6f8;
+  --panel: #fffefe;
+  --text: #2a1f26;
+  --muted: #7d6a74;
+  --line: #ebd7e0;
+  --accent: #cb2f7a;
   --accent-ink: #ffffff;
-  --user: #efe7d8;
+  --user: #fde7f1;
   --assistant: #ffffff;
-  --radius: 16px;
+  --radius: 18px;
 }
 
 * {
@@ -25,8 +25,9 @@ body {
 
 body {
   background:
-    radial-gradient(circle at 15% 10%, #f3d9b8 0%, transparent 35%),
-    radial-gradient(circle at 80% 25%, #d7ebe4 0%, transparent 38%),
+    radial-gradient(circle at 12% 8%, #ffd5e8 0%, transparent 35%),
+    radial-gradient(circle at 84% 16%, #ffdfe7 0%, transparent 34%),
+    radial-gradient(circle at 75% 90%, #f5d8ff 0%, transparent 32%),
     var(--bg);
   display: grid;
   place-items: center;
@@ -42,17 +43,17 @@ body {
 }
 
 .bg-shape-1 {
-  width: 220px;
-  height: 220px;
-  background: #efbe8a;
+  width: 260px;
+  height: 260px;
+  background: #ffc5dd;
   top: 8%;
   left: 4%;
 }
 
 .bg-shape-2 {
-  width: 300px;
-  height: 300px;
-  background: #7fc9bc;
+  width: 320px;
+  height: 320px;
+  background: #e1c0ff;
   bottom: 8%;
   right: 5%;
 }
@@ -70,16 +71,32 @@ body {
 }
 
 .topbar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px 20px;
+  display: grid;
+  gap: 6px;
+  padding: 20px 24px 18px;
   border-bottom: 1px solid var(--line);
+  background: linear-gradient(125deg, #fff8fb 0%, #fff1f7 55%, #fff8fb 100%);
 }
 
 h1 {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   margin: 0;
+  line-height: 1.2;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  color: #a55b83;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 
 .settings {
@@ -128,7 +145,43 @@ textarea {
 .auth-gate {
   padding: 20px;
   border-bottom: 1px solid var(--line);
-  background: #fbf8f2;
+  background: #fff7fb;
+}
+
+.auth-art {
+  position: relative;
+  height: 48px;
+  margin-bottom: 10px;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(2px);
+}
+
+.orb-a {
+  width: 38px;
+  height: 38px;
+  left: 2px;
+  top: 8px;
+  background: #ffc4de;
+}
+
+.orb-b {
+  width: 26px;
+  height: 26px;
+  left: 36px;
+  top: 2px;
+  background: #ff8fbf;
+}
+
+.orb-c {
+  width: 20px;
+  height: 20px;
+  left: 66px;
+  top: 22px;
+  background: #e1b6ff;
 }
 
 .auth-copy {
@@ -249,6 +302,10 @@ textarea {
 
   .composer {
     grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 1.08rem;
   }
 
   .btn {

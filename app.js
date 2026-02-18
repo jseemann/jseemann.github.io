@@ -43,7 +43,7 @@ function unlockChat() {
   authGate.classList.add("hidden");
   messagesEl.classList.remove("hidden");
   chatForm.classList.remove("hidden");
-  appendMessage("assistant", "Unlocked. Ask me anything.");
+  appendMessage("assistant", "Unlocked. I'm here for you.");
   promptInput.focus();
 }
 
@@ -67,7 +67,7 @@ async function sendMessage(userText) {
   if (!response.ok) {
     const errorText = await response.text();
     if (response.status === 401) {
-      throw new Error("Incorrect password.");
+      throw new Error("Incorrect password. Please use the updated password.");
     }
     throw new Error(`API error (${response.status}): ${errorText}`);
   }

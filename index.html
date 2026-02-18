@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Chatbot</title>
+    <title>A Chatbot Made Especially For My Lovely Wife</title>
     <script>
       if (location.hostname === "jseemann.github.io") {
         location.replace(`https://rewards-chatbot.pages.dev${location.pathname}${location.search}${location.hash}`);
@@ -23,12 +23,19 @@
 
     <main class="app">
       <header class="topbar">
-        <h1>Rewards Chatbot</h1>
+        <p class="eyebrow">Private Chat</p>
+        <h1>A Chatbot Made Especially For My Lovely Wife</h1>
+        <p class="subtitle">A cozy place for thoughtful chats, ideas, and smiles.</p>
       </header>
 
       <section id="authGate" class="auth-gate" aria-label="Access control">
-        <p class="auth-copy">Enter password to use the chatbot.</p>
-        <p class="auth-copy">API key is stored server-side in Cloudflare Worker secrets.</p>
+        <div class="auth-art" aria-hidden="true">
+          <span class="orb orb-a"></span>
+          <span class="orb orb-b"></span>
+          <span class="orb orb-c"></span>
+        </div>
+        <p class="auth-copy">Enter password to unlock your private chatbot.</p>
+        <p class="auth-copy">Everything runs through secure server-side keys.</p>
         <form id="unlockForm" class="auth-form">
           <input id="accessPassword" type="password" placeholder="Password" autocomplete="off" required />
           <button class="btn" type="submit">Unlock</button>
