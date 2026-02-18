@@ -18,40 +18,23 @@
 
     <main class="app">
       <header class="topbar">
-        <h1>Chatbot</h1>
-        <button id="settingsToggle" class="btn ghost" type="button">Settings</button>
+        <h1>Rewards Chatbot</h1>
       </header>
 
-      <section id="settingsPanel" class="settings hidden" aria-label="API settings">
-        <label for="apiKey">OpenAI API Key</label>
-        <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off" />
-
-        <label for="model">Model</label>
-        <input id="model" type="text" value="gpt-4.1-mini" autocomplete="off" />
-
-        <label for="blockedTopics">Blocked Topics/Keywords (comma-separated)</label>
-        <textarea
-          id="blockedTopics"
-          rows="2"
-          placeholder="ex: politics, religion, medical advice"
-        ></textarea>
-
-        <label for="guardrailPolicy">Behavior Policy (optional)</label>
-        <textarea
-          id="guardrailPolicy"
-          rows="3"
-          placeholder="ex: Keep answers family-friendly and avoid strong language."
-        ></textarea>
-
-        <button id="saveSettings" class="btn" type="button">Save</button>
-        <p class="note">
-          Your key is stored in this browser only. For production, use a backend proxy instead of exposing API keys client-side.
-        </p>
+      <section id="authGate" class="auth-gate" aria-label="Access control">
+        <p class="auth-copy">Enter password to use the chatbot.</p>
+        <p class="auth-copy">Your API key is used only in this browser session and is not embedded in site code.</p>
+        <form id="unlockForm" class="auth-form">
+          <input id="accessPassword" type="password" placeholder="Password" autocomplete="off" required />
+          <input id="runtimeApiKey" type="password" placeholder="OpenAI API key (sk-...)" autocomplete="off" required />
+          <button class="btn" type="submit">Unlock</button>
+        </form>
+        <p id="authError" class="auth-error"></p>
       </section>
 
-      <section id="messages" class="messages" aria-live="polite"></section>
+      <section id="messages" class="messages hidden" aria-live="polite"></section>
 
-      <form id="chatForm" class="composer">
+      <form id="chatForm" class="composer hidden">
         <textarea
           id="prompt"
           rows="1"

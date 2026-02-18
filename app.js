@@ -1,24 +1,21 @@
-const settingsToggle = document.getElementById("settingsToggle");
-const settingsPanel = document.getElementById("settingsPanel");
-const apiKeyInput = document.getElementById("apiKey");
-const modelInput = document.getElementById("model");
-const blockedTopicsInput = document.getElementById("blockedTopics");
-const guardrailPolicyInput = document.getElementById("guardrailPolicy");
-const saveSettings = document.getElementById("saveSettings");
+const MODEL = "gpt-4.1-mini";
+const ACCESS_PASSWORD = "Credit";
+const BEHAVIOR_POLICY = "Make every answer come back to credit card rewards points somehow.";
+
+const authGate = document.getElementById("authGate");
+const unlockForm = document.getElementById("unlockForm");
+const accessPasswordInput = document.getElementById("accessPassword");
+const runtimeApiKeyInput = document.getElementById("runtimeApiKey");
+const authError = document.getElementById("authError");
 const messagesEl = document.getElementById("messages");
 const chatForm = document.getElementById("chatForm");
 const promptInput = document.getElementById("prompt");
 const sendButton = document.getElementById("sendButton");
 const messageTemplate = document.getElementById("messageTemplate");
 
-const STORAGE_KEYS = {
-  apiKey: "chatbot_api_key",
-  model: "chatbot_model",
-  blockedTopics: "chatbot_blocked_topics",
-  guardrailPolicy: "chatbot_guardrail_policy",
-};
-
 const conversation = [];
+let isUnlocked = false;
+let runtimeApiKey = "";
 
 function extractAssistantText(data) {
   if (typeof data.output_text === "string" && data.output_text.trim()) {
@@ -48,43 +45,6 @@ function extractAssistantText(data) {
   return parts.join("\n\n").trim();
 }
 
-function loadSettings() {
-  apiKeyInput.value = localStorage.getItem(STORAGE_KEYS.apiKey) || "";
-  modelInput.value = localStorage.getItem(STORAGE_KEYS.model) || "gpt-4.1-mini";
-  blockedTopicsInput.value = localStorage.getItem(STORAGE_KEYS.blockedTopics) || "";
-  guardrailPolicyInput.value = localStorage.getItem(STORAGE_KEYS.guardrailPolicy) || "";
-}
-
-function getBlockedTopics() {
-  const raw = localStorage.getItem(STORAGE_KEYS.blockedTopics) || "";
-  return raw
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-}
-
-function findBlockedTopic(text, blockedTopics) {
-  const normalizedText = text.toLowerCase();
-  return blockedTopics.find((topic) => normalizedText.includes(topic)) || null;
-}
-
-function buildSystemGuardrailPrompt(blockedTopics, customPolicy) {
-  const policyParts = [
-    "Follow these behavioral rules for every reply.",
-    "If a user asks for blocked content, refuse briefly and offer a safer alternative topic.",
-  ];
-
-  if (customPolicy) {
-    policyParts.push(`Custom policy: ${customPolicy}`);
-  }
-
-  if (blockedTopics.length) {
-    policyParts.push(`Blocked topics/keywords: ${blockedTopics.join(", ")}`);
-  }
-
-  return policyParts.join(" ");
-}
-
 function appendMessage(role, content) {
   const node = messageTemplate.content.cloneNode(true);
   const article = node.querySelector(".message");
@@ -109,45 +69,40 @@ function autosizeInput() {
   promptInput.style.height = `${Math.min(promptInput.scrollHeight, 140)}px`;
 }
 
-async function sendMessage(userText) {
-  const apiKey = localStorage.getItem(STORAGE_KEYS.apiKey);
-  const model = localStorage.getItem(STORAGE_KEYS.model) || "gpt-4.1-mini";
-  const blockedTopics = getBlockedTopics();
-  const customPolicy = (localStorage.getItem(STORAGE_KEYS.guardrailPolicy) || "").trim();
+function unlockChat() {
+  isUnlocked = true;
+  authGate.classList.add("hidden");
+  messagesEl.classList.remove("hidden");
+  chatForm.classList.remove("hidden");
+  appendMessage("assistant", "Unlocked. Ask me anything.");
+  promptInput.focus();
+}
 
-  if (!apiKey) {
-    appendMessage("assistant", "Add your OpenAI API key in Settings first.");
+async function sendMessage(userText) {
+  if (!isUnlocked) {
+    appendMessage("assistant", "Enter password first.");
     return;
   }
 
-  const blockedTopic = findBlockedTopic(userText, blockedTopics);
-  if (blockedTopic) {
-    appendMessage(
-      "assistant",
-      `I can't discuss "${blockedTopic}" based on your guardrail settings. Try a different topic.`
-    );
+  if (!runtimeApiKey) {
+    appendMessage("assistant", "API key is missing. Reload and unlock again.");
     return;
   }
 
   conversation.push({ role: "user", content: userText });
-  const inputWithGuardrails = conversation.slice();
-
-  if (blockedTopics.length || customPolicy) {
-    inputWithGuardrails.unshift({
-      role: "system",
-      content: buildSystemGuardrailPrompt(blockedTopics, customPolicy),
-    });
-  }
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${runtimeApiKey}`,
     },
     body: JSON.stringify({
-      model,
-      input: inputWithGuardrails,
+      model: MODEL,
+      input: [
+        { role: "system", content: BEHAVIOR_POLICY },
+        ...conversation,
+      ],
     }),
   });
 
@@ -158,29 +113,31 @@ async function sendMessage(userText) {
 
   const data = await response.json();
   const assistantText = extractAssistantText(data) || "The API returned a response, but no text content.";
-  const blockedInAssistantReply = findBlockedTopic(assistantText, blockedTopics);
-  if (blockedInAssistantReply) {
-    appendMessage(
-      "assistant",
-      "I blocked that reply because it matched your guardrail settings. Please refine your prompt."
-    );
-    return;
-  }
-
   conversation.push({ role: "assistant", content: assistantText });
   appendMessage("assistant", assistantText);
 }
 
-settingsToggle.addEventListener("click", () => {
-  settingsPanel.classList.toggle("hidden");
-});
+unlockForm.addEventListener("submit", (event) => {
+  event.preventDefault();
 
-saveSettings.addEventListener("click", () => {
-  localStorage.setItem(STORAGE_KEYS.apiKey, apiKeyInput.value.trim());
-  localStorage.setItem(STORAGE_KEYS.model, modelInput.value.trim() || "gpt-4.1-mini");
-  localStorage.setItem(STORAGE_KEYS.blockedTopics, blockedTopicsInput.value.trim());
-  localStorage.setItem(STORAGE_KEYS.guardrailPolicy, guardrailPolicyInput.value.trim());
-  appendMessage("assistant", "Settings saved.");
+  if (accessPasswordInput.value !== ACCESS_PASSWORD) {
+    authError.textContent = "Incorrect password.";
+    accessPasswordInput.value = "";
+    accessPasswordInput.focus();
+    return;
+  }
+
+  runtimeApiKey = runtimeApiKeyInput.value.trim();
+  if (!runtimeApiKey.startsWith("sk-")) {
+    authError.textContent = "Enter a valid OpenAI API key.";
+    runtimeApiKeyInput.focus();
+    return;
+  }
+
+  authError.textContent = "";
+  accessPasswordInput.value = "";
+  runtimeApiKeyInput.value = "";
+  unlockChat();
 });
 
 promptInput.addEventListener("input", autosizeInput);
@@ -213,6 +170,4 @@ chatForm.addEventListener("submit", async (event) => {
   }
 });
 
-loadSettings();
-appendMessage("assistant", "Hi. Add your API key in Settings, then start chatting.");
 autosizeInput();

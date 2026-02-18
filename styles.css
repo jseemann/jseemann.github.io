@@ -71,7 +71,7 @@ body {
 
 .topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid var(--line);
@@ -93,6 +93,10 @@ h1 {
 
 .settings.hidden {
   display: none;
+}
+
+.hidden {
+  display: none !important;
 }
 
 label {
@@ -119,6 +123,31 @@ textarea {
   margin: 4px 0 0;
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.auth-gate {
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+  background: #fbf8f2;
+}
+
+.auth-copy {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.auth-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.auth-error {
+  margin: 8px 0 0;
+  min-height: 1.1em;
+  color: #9f2d2d;
+  font-size: 0.85rem;
 }
 
 .messages {
