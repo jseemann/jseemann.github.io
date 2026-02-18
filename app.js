@@ -1,11 +1,8 @@
-const MODEL = "gpt-4.1-mini";
-const ACCESS_PASSWORD = "Credit";
-const BEHAVIOR_POLICY = "Make every answer come back to credit card rewards points somehow.";
+const CHAT_ENDPOINT = "https://REPLACE_WITH_YOUR_WORKER.workers.dev/chat";
 
 const authGate = document.getElementById("authGate");
 const unlockForm = document.getElementById("unlockForm");
 const accessPasswordInput = document.getElementById("accessPassword");
-const runtimeApiKeyInput = document.getElementById("runtimeApiKey");
 const authError = document.getElementById("authError");
 const messagesEl = document.getElementById("messages");
 const chatForm = document.getElementById("chatForm");
@@ -15,35 +12,7 @@ const messageTemplate = document.getElementById("messageTemplate");
 
 const conversation = [];
 let isUnlocked = false;
-let runtimeApiKey = "";
-
-function extractAssistantText(data) {
-  if (typeof data.output_text === "string" && data.output_text.trim()) {
-    return data.output_text.trim();
-  }
-
-  if (!Array.isArray(data.output)) {
-    return "";
-  }
-
-  const parts = [];
-  for (const item of data.output) {
-    if (!item || item.type !== "message" || !Array.isArray(item.content)) {
-      continue;
-    }
-
-    for (const block of item.content) {
-      if (!block) continue;
-      if (typeof block.text === "string" && block.text.trim()) {
-        parts.push(block.text.trim());
-      } else if (typeof block.output_text === "string" && block.output_text.trim()) {
-        parts.push(block.output_text.trim());
-      }
-    }
-  }
-
-  return parts.join("\n\n").trim();
-}
+let accessPassword = "";
 
 function appendMessage(role, content) {
   const node = messageTemplate.content.cloneNode(true);
@@ -84,35 +53,29 @@ async function sendMessage(userText) {
     return;
   }
 
-  if (!runtimeApiKey) {
-    appendMessage("assistant", "API key is missing. Reload and unlock again.");
-    return;
-  }
-
   conversation.push({ role: "user", content: userText });
 
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const response = await fetch(CHAT_ENDPOINT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${runtimeApiKey}`,
+      "x-chat-password": accessPassword,
     },
     body: JSON.stringify({
-      model: MODEL,
-      input: [
-        { role: "system", content: BEHAVIOR_POLICY },
-        ...conversation,
-      ],
+      conversation,
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
+    if (response.status === 401) {
+      throw new Error("Incorrect password.");
+    }
     throw new Error(`API error (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();
-  const assistantText = extractAssistantText(data) || "The API returned a response, but no text content.";
+  const assistantText = data.text || "The API returned a response, but no text content.";
   conversation.push({ role: "assistant", content: assistantText });
   appendMessage("assistant", assistantText);
 }
@@ -120,23 +83,11 @@ async function sendMessage(userText) {
 unlockForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  if (accessPasswordInput.value !== ACCESS_PASSWORD) {
-    authError.textContent = "Incorrect password.";
-    accessPasswordInput.value = "";
-    accessPasswordInput.focus();
-    return;
-  }
+  if (!accessPasswordInput.value.trim()) return;
 
-  runtimeApiKey = runtimeApiKeyInput.value.trim();
-  if (!runtimeApiKey.startsWith("sk-")) {
-    authError.textContent = "Enter a valid OpenAI API key.";
-    runtimeApiKeyInput.focus();
-    return;
-  }
-
+  accessPassword = accessPasswordInput.value.trim();
   authError.textContent = "";
   accessPasswordInput.value = "";
-  runtimeApiKeyInput.value = "";
   unlockChat();
 });
 
