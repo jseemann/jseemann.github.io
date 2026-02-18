@@ -5,4 +5,4 @@ compatibility_date = "2025-01-01"
 [vars]
 MODEL = "gpt-4.1-mini"
 BEHAVIOR_POLICY = "Make every answer come back to credit card rewards points somehow."
-ALLOWED_ORIGIN = "https://jseemann.github.io"
+ALLOWED_ORIGIN = "*"
