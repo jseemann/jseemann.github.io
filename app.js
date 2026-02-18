@@ -57,11 +57,9 @@ async function sendMessage(userText) {
 
   const response = await fetch(CHAT_ENDPOINT, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-chat-password": accessPassword,
-    },
+    headers: { "Content-Type": "text/plain;charset=UTF-8" },
     body: JSON.stringify({
+      password: accessPassword,
       conversation,
     }),
   });

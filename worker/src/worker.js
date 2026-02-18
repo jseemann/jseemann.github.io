@@ -1,7 +1,7 @@
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Headers": "Content-Type, x-chat-password",
+    "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 }
@@ -62,16 +62,16 @@ export default {
       return json({ error: "Server is missing required secrets" }, 500, origin);
     }
 
-    const password = request.headers.get("x-chat-password") || "";
-    if (password !== env.ACCESS_PASSWORD) {
-      return json({ error: "Unauthorized" }, 401, origin);
-    }
-
     let body;
     try {
-      body = await request.json();
+      body = JSON.parse(await request.text());
     } catch {
       return json({ error: "Invalid JSON body" }, 400, origin);
+    }
+
+    const password = typeof body.password === "string" ? body.password : "";
+    if (password !== env.ACCESS_PASSWORD) {
+      return json({ error: "Unauthorized" }, 401, origin);
     }
 
     const conversation = Array.isArray(body.conversation) ? body.conversation : [];
