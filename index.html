@@ -29,6 +29,20 @@
         <label for="model">Model</label>
         <input id="model" type="text" value="gpt-4.1-mini" autocomplete="off" />
 
+        <label for="blockedTopics">Blocked Topics/Keywords (comma-separated)</label>
+        <textarea
+          id="blockedTopics"
+          rows="2"
+          placeholder="ex: politics, religion, medical advice"
+        ></textarea>
+
+        <label for="guardrailPolicy">Behavior Policy (optional)</label>
+        <textarea
+          id="guardrailPolicy"
+          rows="3"
+          placeholder="ex: Keep answers family-friendly and avoid strong language."
+        ></textarea>
+
         <button id="saveSettings" class="btn" type="button">Save</button>
         <p class="note">
           Your key is stored in this browser only. For production, use a backend proxy instead of exposing API keys client-side.
