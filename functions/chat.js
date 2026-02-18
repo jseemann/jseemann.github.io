@@ -56,8 +56,9 @@ export async function onRequestPost(context) {
     return json({ error: "Invalid JSON body" }, 400, "*");
   }
 
-  const password = typeof body.password === "string" ? body.password : "";
-  if (password !== env.ACCESS_PASSWORD) {
+  const password = typeof body.password === "string" ? body.password.trim().toLowerCase() : "";
+  const expectedPassword = String(env.ACCESS_PASSWORD).trim().toLowerCase();
+  if (password !== expectedPassword) {
     return json({ error: "Unauthorized" }, 401, "*");
   }
 
