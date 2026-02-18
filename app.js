@@ -1,4 +1,4 @@
-const CHAT_ENDPOINT = "https://REPLACE_WITH_YOUR_WORKER.workers.dev/chat";
+const CHAT_ENDPOINT = "https://rewards-chatbot-proxy.jseemann.workers.dev/chat";
 
 const authGate = document.getElementById("authGate");
 const unlockForm = document.getElementById("unlockForm");
